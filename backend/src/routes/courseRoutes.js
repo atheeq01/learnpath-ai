@@ -1,12 +1,13 @@
 import { Router } from "express";
 
-import {createCourse, getCourse,
+import {createCourse, getCourse,getCourseById,
 
 } from "../controllers/courseController.js"
 
 import { authenticate } from "../middleware/authenticate.js";
 import { authorize } from "../middleware/authorize.js";
 import { validate } from "../middleware/validate.js";
+import { validateCourseId } from "../middleware/validateCourseId.js";
 
 import {
     createCourseSchema,
@@ -23,7 +24,14 @@ router.post(
     createCourse
 )
 
-
 // list the all course (public)
 router.get("/",getCourse)
+
+
+router.get(
+  "/:id",
+  validateCourseId,
+  getCourseById
+);
+
 export default router

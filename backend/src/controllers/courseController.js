@@ -57,3 +57,27 @@ export const getCourse = async (req,res)=>{
     courses,
   });
 }
+
+// get the course using the id 
+export const getCourseById = async (req, res) => {
+  const { id } = req.params;
+
+  const course = await Course.findById(id)
+    .select(
+      "title description content category level instructorId createdAt updatedAt"
+    )
+    .lean();
+
+  if (!course) {
+    return res.status(404).json({
+      success: false,
+      message: "Course not found",
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    message: "Course retrieved successfully",
+    course,
+  });
+};
