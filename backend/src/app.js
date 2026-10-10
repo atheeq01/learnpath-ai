@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import morgan from "morgan"
 
 import authRoutes from "./routes/authRoutes.js";
+import courseRoutes from "./routes/courseRoutes.js"
 
 import {
     notFound,
@@ -48,6 +49,9 @@ app.get("/api/health", (req, res) => {
 
 // auth router
 app.use("/api/auth", authRoutes);
+
+// course router
+app.use("/api/courses",courseRoutes)
 
 // unknown route handler
 app.use(notFound);
