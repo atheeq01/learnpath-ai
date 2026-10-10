@@ -14,8 +14,8 @@ import {
 
 const app = express();
 
-app.set("trust proxy", true);
-
+// app.set("trust proxy", true);
+app.set("trust proxy", process.env.NODE_ENV === "production" ? 1 : false);
 
 // log the http
 app.use(morgan("dev"));

@@ -13,6 +13,6 @@ export const authorize = (...allowedRoles) => {
                 message: "Access denied. Insufficient permissions",
             });
         }
+        next();
     }
-    next();
 }
