@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import {createCourse,
+import {createCourse, getCourse,
 
 } from "../controllers/courseController.js"
 
@@ -23,4 +23,7 @@ router.post(
     createCourse
 )
 
+
+// list the all course (public)
+router.get("/",getCourse)
 export default router
