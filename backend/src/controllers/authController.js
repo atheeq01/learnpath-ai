@@ -98,3 +98,18 @@ export const login = async (req, res) => {
     },
   });
 }
+
+// get the current user 
+export const getMe = async (req, res) => {
+  return res.status(200).json({
+    success: true,
+    message: "User profile retrieved successfully",
+    user: {
+      id: req.user.id,
+      name: req.user.name,
+      username: req.user.username,
+      email: req.user.email,
+      role: req.user.role,
+    },
+  });
+};
