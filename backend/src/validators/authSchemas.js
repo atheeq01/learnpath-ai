@@ -33,3 +33,20 @@ export const registerSchema = z
         role: z.enum(["student", "instructor"]),
     })
     .strict();
+
+
+export const loginSchema = z
+  .object({
+    identifier: z
+      .string()
+      .trim()
+      .toLowerCase()
+      .min(3, "Username or email must contain at least 3 characters")
+      .max(100, "Username or email is too long"),
+
+    password: z
+      .string()
+      .min(1, "Password is required")
+      .max(128, "Password is too long"),
+  })
+  .strict();

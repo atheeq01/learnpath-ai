@@ -1,11 +1,13 @@
 import bcrypt from "bcrypt";
-
 import User from "../models/User.js";
+import jwt from "jsonwebtoken";
+import { success } from "zod";
 
+
+// register 
 export const register = async (req, res) => {
   const { name, username, email, password, role } = req.body;
 
-  // check the user is already exist or not 
   const existingUser = await User.findOne({
     $or: [{ username }, { email }],
   });
@@ -17,10 +19,8 @@ export const register = async (req, res) => {
     });
   }
 
-  // hash password
   const passwordHash = await bcrypt.hash(password, 12);
 
-  // create new user
   const user = await User.create({
     name,
     username,
@@ -42,3 +42,59 @@ export const register = async (req, res) => {
     },
   });
 };
+
+// login and create the jwt
+export const login = async (req, res) => {
+  const { identifier, password } = req.body;
+
+  const user = await User.findOne({
+    $or: [
+      { username: identifier },
+      { email: identifier },
+    ],
+  }).select("+passwordHash");
+
+  if (!user) {
+    return res.status(401).json({
+      success: false,
+      message: "Invalid credentials"
+    });
+  }
+  const isPasswordValid = await bcrypt
+    .compare(password, user.passwordHash);
+
+  if (!isPasswordValid) {
+    return res.status(401).json({
+      success: false,
+      message: "Invalid credentials"
+    });
+  }
+  const jwtSecret = process.env.JWT_SECRET;
+
+  if (!jwtSecret || jwtSecret.length < 32) {
+    throw new Error("JWT_SECRET is missing or too short")
+  }
+
+  const token = jwt.sign({
+    id: user._id.toString(),
+    role: user.role,
+  },
+    jwtSecret,
+    {
+      algorithm: "HS256",
+      expiresIn: "2h"
+    });
+
+  return res.status(200).json({
+    success: true,
+    message: "Login successful",
+    token,
+    user: {
+      id: user._id.toString(),
+      name: user.name,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+    },
+  });
+}

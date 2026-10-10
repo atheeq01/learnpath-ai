@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import mongoose from "mongoose";
-import process from "node:process"
+import morgan from "morgan"
 
 import authRoutes from "./routes/authRoutes.js";
 
@@ -15,6 +15,10 @@ import {
 const app = express();
 
 app.set("trust proxy", true);
+
+
+// log the http
+app.use(morgan("dev"));
 
 // hide the security header
 app.use(helmet());
