@@ -22,6 +22,7 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.11.1",
     "morgan": "^1.12.1",
+    "openai": "^7.32.0",
     "validator": "^13.15.35",
     "zod": "^4.6.5"
   },

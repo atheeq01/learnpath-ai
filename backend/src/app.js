@@ -8,6 +8,7 @@ import authRoutes from "./routes/authRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js"
 import enrollmentRoutes from "./routes/enrollmentRoutes.js";
 import instructorRoutes from "./routes/instructorRoutes.js";
+import aiRoutes from "./routes/aiRoutes.js";
 
 import {
     notFound,
@@ -60,6 +61,9 @@ app.use("/api/enrollments", enrollmentRoutes);
 
 // instructor only enroll management  
 app.use("/api/instructor", instructorRoutes);
+
+// ai router
+app.use("/api/ai", aiRoutes);
 
 // unknown route handler
 app.use(notFound);
