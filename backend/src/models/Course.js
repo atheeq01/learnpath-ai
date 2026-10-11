@@ -46,6 +46,22 @@ const courseSchema = new mongoose.Schema(
       required: true,
       immutable: true,
     },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+
+    deletedAt: {
+      type: Date,
+      default: null,
+    },
+
+    enrollmentRevision: {
+      type: Number,
+      default: 0,
+      select: false,
+    },
+    
   },
   {
     timestamps: true,

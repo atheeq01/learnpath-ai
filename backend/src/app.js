@@ -6,6 +6,8 @@ import morgan from "morgan"
 
 import authRoutes from "./routes/authRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js"
+import enrollmentRoutes from "./routes/enrollmentRoutes.js";
+import instructorRoutes from "./routes/instructorRoutes.js";
 
 import {
     notFound,
@@ -52,6 +54,12 @@ app.use("/api/auth", authRoutes);
 
 // course router
 app.use("/api/courses",courseRoutes)
+
+// enrollment router
+app.use("/api/enrollments", enrollmentRoutes);
+
+// instructor only enroll management  
+app.use("/api/instructor", instructorRoutes);
 
 // unknown route handler
 app.use(notFound);

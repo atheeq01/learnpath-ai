@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+// create the course 
 export const createCourseSchema = z
   .object({
     title: z
@@ -33,3 +34,13 @@ export const createCourseSchema = z
     ]),
   })
   .strict();
+
+// for update the course 
+export const updateCourseSchema = createCourseSchema
+  .partial()
+  .refine(
+    (data) => Object.keys(data).length > 0,
+    {
+      message: "At least one field is required",
+    }
+  );

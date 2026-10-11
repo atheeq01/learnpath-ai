@@ -3,6 +3,8 @@ import 'dotenv/config';
 import app from './app.js';
 import { connectDB } from './config/db.js';
 import User from './models/User.js';
+import Course from './models/Course.js';
+import Enrollment from "./models/Enrollment.js";
 
 
 const PORT = process.env.PORT || 8080;
@@ -12,6 +14,8 @@ const startServer = async () => {
     // connect to db
     await connectDB();
     await User.init();
+    await Course.init();
+    await Enrollment.init();
 
     // start the express server
     app.listen(PORT, () => {
