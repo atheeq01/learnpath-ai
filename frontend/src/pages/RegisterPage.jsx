@@ -1,26 +1,51 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router";
-
-import { useAuth } from "../hooks/useAuth";
+import { AuthContext } from "../context/authContext";
 import { registerFormSchema } from "../validators/authForms";
-import { getApiError } from "../lib/apiError";
+import { getApiError } from "../services/apiError";
+import AuthLayout from "../components/AuthLayout";
 
 const fields = [
-  { name: "name", label: "Full Name", type: "text" },
-  { name: "username", label: "Username", type: "text" },
-  { name: "email", label: "Email", type: "email" },
-  { name: "password", label: "Password", type: "password" },
+  {
+    name: "name",
+    label: "Full name",
+    type: "text",
+    autoComplete: "name",
+    placeholder: "Your full name",
+  },
+  {
+    name: "username",
+    label: "Username",
+    type: "text",
+    autoComplete: "username",
+    placeholder: "Choose a username",
+  },
+  {
+    name: "email",
+    label: "Email address",
+    type: "email",
+    autoComplete: "email",
+    placeholder: "you@example.com",
+  },
+  {
+    name: "password",
+    label: "Password",
+    type: "password",
+    autoComplete: "new-password",
+    placeholder: "At least 8 characters",
+  },
   {
     name: "confirmPassword",
-    label: "Confirm Password",
+    label: "Confirm password",
     type: "password",
+    autoComplete: "new-password",
+    placeholder: "Enter your password again",
   },
 ];
 
 export default function RegisterPage() {
   const navigate = useNavigate();
-  const { register } = useAuth();
-
+  const { register } = useContext(AuthContext);
   const [form, setForm] = useState({
     name: "",
     username: "",
@@ -29,149 +54,109 @@ export default function RegisterPage() {
     confirmPassword: "",
     role: "student",
   });
-
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
-
-    setErrors({});
+  function handleChange(event) {
+    setForm({ ...form, [event.target.name]: event.target.value });
+    setErrors({ ...errors, [event.target.name]: "" });
     setServerError("");
-  };
+  }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    setErrors({});
+  async function handleSubmit(event) {
+    event.preventDefault();
+    if (loading) return;
     setServerError("");
-
     const result = registerFormSchema.safeParse(form);
-
     if (!result.success) {
       const fieldErrors = {};
-
       result.error.issues.forEach((issue) => {
         fieldErrors[issue.path[0]] = issue.message;
       });
-
       setErrors(fieldErrors);
       return;
     }
-
-    // Do not send confirmPassword to backend
-    const { confirmPassword, ...userData } = result.data;
-
+    setErrors({});
+    // Confirmation is checked in the browser; the API only accepts these fields.
+    const { name, username, email, password, role } = result.data;
+    setLoading(true);
     try {
-      setLoading(true);
-
-      await register(userData);
-
-      navigate("/login", {
-        replace: true,
-        state: { registered: true },
-      });
+      await register({ name, username, email, password, role });
+      navigate("/login", { replace: true, state: { registered: true } });
     } catch (error) {
       setServerError(getApiError(error));
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   return (
-    <main className="min-h-[80vh] flex items-center justify-center px-4 py-10">
-      <div className="w-full max-w-lg bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
-
-        <h1 className="text-3xl font-bold">
-          Create Account
-        </h1>
-
-        <p className="text-slate-500 mt-2 mb-6">
-          Join LearnPath AI and start learning
+    <AuthLayout
+      title="Create an account"
+      description="Register as a student or an instructor."
+    >
+      {serverError && (
+        <p className="error-message mb-5" role="alert">
+          {serverError}
         </p>
-
-        {serverError && (
-          <p role="alert" className="bg-red-50 text-red-600 p-3 rounded-lg mb-4">
-            {serverError}
-          </p>
-        )}
-
-        <form onSubmit={handleSubmit} noValidate className="space-y-4">
-
-          {fields.map((field) => (
-            <div key={field.name}>
-              <label
-                htmlFor={field.name}
-                className="block font-medium mb-1"
-              >
-                {field.label}
-              </label>
-
-              <input
-                id={field.name}
-                type={field.type}
-                name={field.name}
-                value={form[field.name]}
-                onChange={handleChange}
-                autoComplete={
-                  field.name === "password" ||
-                  field.name === "confirmPassword"
-                    ? "new-password"
-                    : field.name === "name"
-                      ? "name"
-                      : field.name
-                }
-                className="w-full border rounded-lg px-4 py-3"
-                placeholder={`Enter ${field.label.toLowerCase()}`}
-              />
-
-              {errors[field.name] && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors[field.name]}
-                </p>
-              )}
-            </div>
-          ))}
-
-          <div>
-            <label htmlFor="role" className="block font-medium mb-1">
-              Register As
-            </label>
-
-            <select
-              id="role"
-              name="role"
-              value={form.role}
+      )}
+      <form onSubmit={handleSubmit} noValidate className="space-y-4">
+        {fields.map((field) => (
+          <div key={field.name}>
+            <label htmlFor={field.name}>{field.label}</label>
+            <input
+              {...field}
+              id={field.name}
+              value={form[field.name]}
               onChange={handleChange}
-              className="w-full border rounded-lg px-4 py-3"
-            >
-              <option value="student">Student</option>
-              <option value="instructor">Instructor</option>
-            </select>
+              aria-invalid={Boolean(errors[field.name])}
+              aria-describedby={
+                errors[field.name] ? `${field.name}-error` : undefined
+              }
+            />
+            {errors[field.name] && (
+              <p
+                id={`${field.name}-error`}
+                className="field-error"
+                role="alert"
+              >
+                {errors[field.name]}
+              </p>
+            )}
           </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg font-semibold disabled:opacity-60"
+        ))}
+        <div>
+          <label htmlFor="role">I'm here to</label>
+          <select
+            id="role"
+            name="role"
+            value={form.role}
+            onChange={handleChange}
           >
-            {loading ? "Creating account..." : "Register"}
-          </button>
-
-        </form>
-
-        <p className="text-center mt-6 text-sm">
-          Already have an account?{" "}
-          <Link to="/login" className="text-indigo-600 font-semibold">
-            Login
-          </Link>
-        </p>
-
-      </div>
-    </main>
+            <option value="student">Learn as a student</option>
+            <option value="instructor">Teach as an instructor</option>
+          </select>
+          {errors.role && (
+            <p className="field-error" role="alert">
+              {errors.role}
+            </p>
+          )}
+        </div>
+        <button
+          type="submit"
+          disabled={loading}
+          className="button-primary w-full"
+        >
+          {loading ? "Creating your account..." : "Create account"}
+        </button>
+      </form>
+      <p className="mt-7 text-center text-sm text-pine-700">
+        Already have an account?{" "}
+        <Link className="text-link" to="/login">
+          Log in
+        </Link>
+      </p>
+    </AuthLayout>
   );
 }

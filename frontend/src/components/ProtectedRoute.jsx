@@ -1,32 +1,25 @@
-import { Navigate, Outlet } from "react-router";
-import { useAuth } from "../hooks/useAuth";
+import { useContext } from "react";
+import { Navigate, Outlet, useLocation } from "react-router";
+import { AuthContext } from "../context/authContext";
 
 export default function ProtectedRoute({ allowedRoles = [] }) {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <p className="p-10 text-center">
-        Checking authentication...
-      </p>
-    );
-  }
+  const { user } = useContext(AuthContext);
+  const location = useLocation();
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
   }
-
-  if (
-    allowedRoles.length > 0 &&
-    !allowedRoles.includes(user.role)
-  ) {
-    const path =
-      user.role === "instructor"
-        ? "/instructor/dashboard"
-        : "/student/dashboard";
-
-    return <Navigate to={path} replace />;
+  if (allowedRoles.length && !allowedRoles.includes(user.role)) {
+    return (
+      <Navigate
+        to={
+          user.role === "instructor"
+            ? "/instructor/dashboard"
+            : "/student/dashboard"
+        }
+        replace
+      />
+    );
   }
-
   return <Outlet />;
 }

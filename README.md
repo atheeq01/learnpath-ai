@@ -4,7 +4,7 @@ Online Learning Platform with AI Course Recommendations.
 
 ## Tech Stack
 
-- Frontend: Next.js
+- Frontend: React, Vite, Tailwind CSS, React Router, Axios
 - Backend: Node.js, Express.js
 - Database: MongoDB Atlas
 - Authentication: JWT, bcrypt
@@ -13,11 +13,13 @@ Online Learning Platform with AI Course Recommendations.
 ## Project Structure
 
 - backend/ - REST API and business logic
-- frontend/ - Next.js web application
+- frontend/ - React web application
 
 ## Development Status
 
-Backend development in progress.
+The student and instructor interfaces include course discovery, enrollment history, course management, student rosters, and AI recommendations.
+
+See the [frontend guide](frontend/README.md) for setup, the simplified file structure, API integration, test commands, known limitations, and interview questions.
 
 ## Features
 
