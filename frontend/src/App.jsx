@@ -15,6 +15,7 @@ import InstructorCoursesPage from "./pages/InstructorCoursesPage";
 import CourseEditorPage from "./pages/CourseEditorPage";
 import CourseStudentsPage from "./pages/CourseStudentsPage";
 import AIAdvisorPage from "./pages/AIAdvisorPage";
+import HomePage from "./pages/HomePage";
 
 export default function App() {
   const { user, loading, authError, logout } = useContext(AuthContext);
@@ -58,10 +59,7 @@ export default function App() {
       <Navbar />
       <div className="flex-1">
         <Routes>
-          <Route
-            path="/"
-            element={<Navigate to={user ? homePath : "/courses"} replace />}
-          />
+          <Route path="/" element={<HomePage />} />
           <Route path="/courses" element={<CoursesPage />} />
           <Route path="/courses/:id" element={<CourseDetailsPage />} />
           <Route path="/login" element={<LoginPage />} />
