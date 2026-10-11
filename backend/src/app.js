@@ -31,7 +31,7 @@ app.use(helmet());
 app.use(
     cors(
         {
-            origin: process.env.NODE_ENV
+            origin: process.env.CLIENT_URL
         }));
 
 // secure from the harmful inject form the json
