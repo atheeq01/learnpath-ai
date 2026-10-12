@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import dns from 'node:dns';
-dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 export const connectDB = async () => {
     const mongoURI = process.env.MONGODB_URI;
@@ -10,6 +9,15 @@ export const connectDB = async () => {
     }
 
     try {
+        const dnsServers = process.env.MONGODB_DNS_SERVERS
+            ?.split(',')
+            .map((server) => server.trim())
+            .filter(Boolean);
+
+        if (dnsServers?.length) {
+            dns.setServers(dnsServers);
+        }
+
         await mongoose.connect(mongoURI);
 
         console.log("MongoDB connected successfully");

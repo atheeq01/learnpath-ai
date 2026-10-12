@@ -35,7 +35,11 @@ export const registerFormSchema = z
     password: z
       .string()
       .min(8, "Use at least 8 characters.")
-      .max(128, "Use at most 128 characters."),
+      .max(128, "Use at most 128 characters.")
+      .refine(
+        (password) => new TextEncoder().encode(password).length <= 72,
+        "Use at most 72 UTF-8 bytes; some characters use multiple bytes.",
+      ),
     confirmPassword: z.string().min(1, "Confirm your password."),
     role: z.enum(["student", "instructor"]),
   })

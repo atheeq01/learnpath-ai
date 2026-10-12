@@ -32,8 +32,9 @@ See the [frontend guide](frontend/README.md) for setup, the simplified file stru
 
 ## Manual deployment
 
-1. In `backend/`, run `npm ci --omit=dev`, configure the environment variables listed in `.env.example`, and start the API with `npm start`.
-2. In `frontend/`, run `npm ci`, set `VITE_API_URL` to the deployed backend URL ending in `/api`, and run `npm run build`.
-3. Upload `frontend/dist/` to your static host. Configure it to serve `index.html` for client-side routes and set the backend's `CLIENT_URL` to the frontend origin.
+1. Build `backend/Dockerfile` with `backend/` as the build context, push a uniquely tagged image to the existing AWS ECR repository, and create a new ECS task definition revision with that image URI. Update the existing ECS service to use the revision.
+2. Keep backend environment variables and secrets in the ECS runtime configuration. Set `CLIENT_URL` to the frontend's CloudFront/custom-domain origin. Configure `/api/health` for health checks; ECS container health checks must be set in the task definition.
+3. In `frontend/`, set `VITE_API_URL` to the HTTPS backend URL ending in `/api`, run `npm ci`, and run `npm run build`.
+4. Upload the contents of `frontend/dist/` to a private S3 bucket served through CloudFront using Origin Access Control. Set `index.html` as the default root object and configure React route fallback. After updates, invalidate the CloudFront cache.
 
-The backend Dockerfile is also available for manually building and running the API as a container.
+The local [AWS deployment guide](DEPLOYMENT.md) contains PowerShell commands, console settings, and rollback steps. This guide is currently excluded by `.gitignore`. No CI/CD pipeline or automated test suite is required.

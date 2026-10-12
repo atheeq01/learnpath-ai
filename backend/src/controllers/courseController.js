@@ -64,7 +64,10 @@ export const getCourse = async (req, res) => {
 export const getCourseById = async (req, res) => {
     const { id } = req.params;
 
-    const course = await Course.findById(id)
+    const course = await Course.findOne({
+        _id: id,
+        isDeleted: { $ne: true },
+    })
         .select(
             "title description content category level instructorId createdAt updatedAt"
         )

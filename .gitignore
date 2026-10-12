@@ -1,5 +1,6 @@
 # Dependencies
 node_modules/
+.verification-tools/
 
 # Environment secrets
 .env
@@ -21,3 +22,5 @@ dist/
 .vscode/
 .DS_Store
 .idea
+DEPLOYMENT.md
+postman/learnpath-ai.postman_collection.json

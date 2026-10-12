@@ -21,14 +21,19 @@ export const registerSchema = z
             ),
 
         email: z
-            .email("Invalid email address")
+            .string()
             .trim()
-            .toLowerCase(),
+            .toLowerCase()
+            .pipe(z.email("Invalid email address")),
 
         password: z
             .string()
             .min(8, "Password must contain at least 8 characters.")
-            .max(128, "Password is too long."),
+            .max(128, "Password is too long.")
+            .refine(
+                (password) => Buffer.byteLength(password, "utf8") <= 72,
+                "Password must use at most 72 UTF-8 bytes."
+            ),
 
         role: z.enum(["student", "instructor"]),
     })
