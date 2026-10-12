@@ -10,9 +10,9 @@ node_modules/
 .next/
 out/
 
-# Build and test output
+# Build output
 dist/
-coverage/
+.cache/
 
 # Logs
 *.log

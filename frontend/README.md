@@ -61,16 +61,12 @@ frontend/
     App.jsx
     main.jsx
     index.css
-  tests/
-    ui.spec.js
-    live-api.spec.js
   .env.example
   .gitignore
   eslint.config.js
   index.html
   package.json
   package-lock.json
-  playwright.config.js
   vite.config.js
   README.md
 ```
@@ -81,7 +77,6 @@ frontend/
 - `services/`: one Axios client plus readable API error messages. These replace `lib/`.
 - `validators/`: Zod rules for authentication, courses, and AI prompts. Keeping validation separate prevents JSX from becoming difficult to read.
 - `public/`: static files served directly, such as the favicon.
-- `tests/`: browser flows and live Express checks; they are not shipped to users.
 - `App.jsx`: public, student, and instructor routes.
 - `main.jsx`: mounts React, the router, and the authentication provider.
 - `index.css`: Tailwind and shared visual styles.
@@ -130,24 +125,9 @@ Course search and filters run locally over the existing catalog response. The AI
 ```sh
 npm run lint
 npm run build
-npx playwright install chromium
-npm test
-npm run test:live
 ```
 
-Playwright starts its own Vite server on port 5174 with the API proxy enabled. It does not reuse or stop your development server on port 5173. `npm test` needs no backend: its network fixtures match the inspected Express contracts. `npm run test:live` requires the backend on port 8080 and at least one existing published course. It reads live data and sends only unauthenticated or invalid requests to write endpoints, which are rejected before writes occur.
-
-Verified during this refactor:
-
-- ESLint and production build: passed.
-- Browser regression suite: 26 passed (13 flows each on desktop Chromium and a mobile Chromium viewport).
-- Live Express integration suite: 2 passed, covering catalog/details rendering through the proxy, authentication requirements, and input validation.
-- Existing backend `npm test`: 7 passed against the running API.
-- Visual review: desktop catalog and mobile catalog/login; no page errors or horizontal overflow in the mobile review.
-
-The browser suite covers search, empty/error states and retry, registration validation, login/logout and return paths, role redirects, expired versus unavailable sessions, enrollment payloads, unknown enrollment state, preserved history, editor resets and save methods, archive failure handling, roster filtering/removal, and AI validation/retry/recommendations.
-
-Authenticated write flows and successful AI responses were checked with mocked network responses, not against live user accounts or the external AI provider. A real course archive remains blocked by an existing backend issue: `backend/src/controllers/courseController.js` uses `mongoose.connection.transaction` in `deleteCourse` without importing `mongoose`. Backend files were left unchanged. The frontend reports the archive failure and keeps the course visible.
+Before deploying, manually check registration, login, course browsing, enrollment, instructor course management, and AI recommendations against your configured backend.
 
 ## Five interview questions
 
